@@ -7,7 +7,7 @@ library(RcppRoll)
 
 #regrab player ids with lower IP threshold
 
-milbPitchers <- read.csv("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/data/MinorLeaguePitchers.csv") %>% 
+milbPitchers <- read.csv("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/rolling_average_report/data/MinorLeaguePitchers.csv") %>% 
   select(1,2,3,26) %>% 
   mutate(playername = paste0(Name, " (", Team, " Age: ", Age, ")")) %>% 
   filter(!grepl("Mexican", Team)) 
@@ -78,7 +78,7 @@ year <- "all"
 raw_pitcher_logs <- list()
 raw_totals_logs <- list()
 
-for (i in 1:nrow(milbPitchers)) {
+for (i in 120:nrow(milbPitchers)) {
 
   data_scrape <- milb_pitcher_game_logs_fg(milbPitchers$PlayerId[i],year)
 
@@ -101,14 +101,14 @@ raw_pitcher_data <- do.call(rbind, raw_pitcher_logs)
 
 totals <- do.call(rbind, raw_totals_logs)
 
-saveRDS(raw_pitcher_data, paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/data/pitcher_logs_", today(), ".rds"))
+saveRDS(raw_pitcher_data, paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/rolling_average_report/data/pitcher_logs_", today(), ".rds"))
 
-saveRDS(totals, paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/data/totals_pitchers_", today(), ".rds"))
+saveRDS(totals, paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/rolling_average_report/data/totals_pitchers_", today(), ".rds"))
 
 
 # quantitative analysis ---------------------------------------------------
 
-raw_pitcher_data <- readRDS(paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/data/pitcher_logs_", today(), ".rds")) %>%
+raw_pitcher_data <- readRDS(paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/rolling_average_report/data/pitcher_logs_", today(), ".rds")) %>%
   mutate(Season = year(Date), 
          Date2 = paste0("2017-",month(Date),"-",day(Date))) %>% 
   separate(IP, into = c("Innings", "Outs")) %>% 
@@ -119,7 +119,7 @@ raw_pitcher_data <- readRDS(paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_
 
 # averages and rolling means
 
-milb_avgs <- readRDS(paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/data/totals_pitchers_", today(), ".rds")) %>% 
+milb_avgs <- readRDS(paste0("C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/rolling_average_report/data/totals_pitchers_", today(), ".rds")) %>% 
   select(player, Team, milb_k_perc = K_perc, milb_bb_perc = BB_perc, milb_avg = AVG, milb_whip = WHIP, 
          milb_babip = BABIP, milb_lob_perc = LOB_perc, milb_fip = FIP) %>% 
   mutate(milb_avg = as.numeric(milb_avg),
