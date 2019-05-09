@@ -33,10 +33,10 @@ theme_smada <- function(){
 # library(rsconnect)
 # rsconnect::deployApp('C://Users/johnp/Documents/GitHub/MiLB_Trend_Graphs/rolling_average_report')
 
-battersMiLB <- read.csv("rolling_average_report/data/milb_2018_batter_ids.csv",header=T) %>%
+battersMiLB <- read.csv("data/milb_2018_batter_ids.csv",header=T) %>%
   mutate(NameTeam = paste0(Name, " (", Team, " Age: ", Age, ")"))
 
-pitchersMiLB <- read.csv("rolling_average_report/data/MinorLeaguePitchers.csv") %>% 
+pitchersMiLB <- read.csv("data/MinorLeaguePitchers.csv") %>% 
   select(1,2,3,26) %>% 
   mutate(playername = paste0(Name, " (", Team, " Age: ", Age, ")"))
 
@@ -161,7 +161,7 @@ server <- function(input, output, session) {
   
   pitcher_ids <- reactive({
     
-    milbPitchers <- read.csv("rolling_average_report/data/MinorLeaguePitchers.csv") %>% 
+    milbPitchers <- read.csv("data/MinorLeaguePitchers.csv") %>% 
       select(1,2,3,26) %>% 
       mutate(playername = paste0(Name, " (", Team, " Age: ", Age, ")"))
     
@@ -169,7 +169,7 @@ server <- function(input, output, session) {
   
   raw_pitcher_data <- reactive({
     
-    data <- readRDS("rolling_average_report/data/pitcher_logs_2019-05-09.rds") %>%
+    data <- readRDS("data/pitcher_logs_2019-05-09.rds") %>%
       mutate(Season = year(Date), 
              Date2 = paste0("2017-",month(Date),"-",day(Date))) %>% 
       separate(IP, into = c("Innings", "Outs")) %>% 
@@ -185,7 +185,7 @@ server <- function(input, output, session) {
     
     # averages and rolling means
     
-    milb_avgs <- readRDS("rolling_average_report/data/totals_pitchers_2019-05-09.rds") %>% 
+    milb_avgs <- readRDS("data/totals_pitchers_2019-05-09.rds") %>% 
       select(player, milb_k_perc = K_perc, milb_bb_perc = BB_perc, milb_avg = AVG, milb_whip = WHIP, 
              milb_babip = BABIP, milb_lob_perc = LOB_perc, milb_fip = FIP) %>% 
       mutate(milb_avg = round(as.numeric(milb_avg),2),
